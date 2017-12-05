@@ -88,6 +88,9 @@ public class BaseNotificationBanner: UIView {
     /// Wether or not the notification banner is currently being displayed
     public private(set) var isDisplaying: Bool = false
 
+    /// show banner with statusBar
+    public var isShownStatusBarForced:Bool? = nil
+
     /// The view that the notification layout is presented on. The constraints/frame of this should not be changed
     internal var contentView: UIView!
     
@@ -105,7 +108,7 @@ public class BaseNotificationBanner: UIView {
     
     /// Used by the banner queue to determine wether a notification banner was placed in front of it in the queue
     var isSuspended: Bool = false
-    
+
     /// Responsible for positioning and auto managing notification banners
     private let bannerQueue: NotificationBannerQueue = NotificationBannerQueue.default
     
@@ -294,7 +297,7 @@ public class BaseNotificationBanner: UIView {
                 }
             } else {
                 appWindow.addSubview(self)
-                if statusBarShouldBeShown() && !(parentViewController == nil && bannerPosition == .top) {
+                if statusBarShouldBeShown() {
                     appWindow.windowLevel = UIWindowLevelNormal
                 } else {
                     appWindow.windowLevel = UIWindowLevelStatusBar + 1
@@ -391,6 +394,10 @@ public class BaseNotificationBanner: UIView {
         the navigation bar
      */
     private func statusBarShouldBeShown() -> Bool {
+
+        if let isShownStatusBarForced = self.isShownStatusBarForced {
+            return isShownStatusBarForced
+        }
         
         for banner in bannerQueue.banners {
             if (banner.parentViewController == nil && banner.bannerPosition == .top) {
